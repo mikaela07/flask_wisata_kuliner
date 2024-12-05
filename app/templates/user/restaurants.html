@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h1>Restaurants</h1>
+
+  <!-- Search and Filter -->
+  <div class="mb-4">
+    <form method="GET" class="form-inline">
+      <input
+        type="text"
+        name="search"
+        class="form-control mr-2"
+        placeholder="Search restaurants..."
+      />
+      <select name="category" class="form-control mr-2">
+        <option value="">All Categories</option>
+        <!-- Add your categories here -->
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+
+  <!-- Restaurant List -->
+  <div class="row">
+    {% for restaurant in restaurants.items %}
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ restaurant.name }}</h5>
+          <p class="card-text">Category: {{ restaurant.category }}</p>
+          <p class="card-text">
+            Rating: {{ "%.1f"|format(restaurant.rating_average) }}
+          </p>
+          <a
+            href="{{ url_for('main.restaurant_detail', id=restaurant.id) }}"
+            class="btn btn-primary"
+            >View Details</a
+          >
+          {% if is_admin %}
+          <a
+            href="{{ url_for('admin.edit_restaurant', id=restaurant.id) }}"
+            class="btn btn-secondary"
+            >Edit</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if restaurants.has_prev %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="{{ url_for('main.list_restaurants', page=restaurants.prev_num) }}"
+          >Previous</a
+        >
+      </li>
+      {% endif %} {% for page_num in restaurants.iter_pages() %}
+      <li
+        class="page-item {% if page_num == restaurants.page %}active{% endif %}"
+      >
+        <a
+          class="page-link"
+          href="{{ url_for('main.list_restaurants', page=page_num) }}"
+          >{{ page_num }}</a
+        >
+      </li>
+      {% endfor %} {% if restaurants.has_next %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="{{ url_for('main.list_restaurants', page=restaurants.next_num) }}"
+          >Next</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

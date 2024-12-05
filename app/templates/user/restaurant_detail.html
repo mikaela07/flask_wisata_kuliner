@@ -1,0 +1,178 @@
+{% extends "base.html" %} {% block title %}{{ restaurant.name }} - Wisata
+Kuliner{% endblock %} {% block content %}
+<div class="container">
+  <div class="row">
+    <!-- Restaurant Details -->
+    <div class="col-md-8">
+      <div class="card mb-4">
+        {% if restaurant.image_url %}
+        <img
+          src="{{ restaurant.image_url }}"
+          class="card-img-top"
+          alt="{{ restaurant.name }}"
+        />
+        {% endif %}
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-title">{{ restaurant.name }}</h2>
+            {% if current_user.is_authenticated %}
+            <button
+              class="btn btn-outline-danger"
+              onclick="toggleFavorite( restaurant.id )"
+            >
+              <i
+                class="bi {% if is_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"
+              ></i>
+            </button>
+            {% endif %}
+          </div>
+
+          <p class="badge bg-secondary">{{ restaurant.category }}</p>
+          <p class="card-text">{{ restaurant.description }}</p>
+
+          <div class="mb-3">
+            <h5>Location</h5>
+            <p><i class="bi bi-geo-alt"></i> {{ restaurant.address }}</p>
+          </div>
+
+          <div class="rating-summary">
+            <h5>Rating</h5>
+            <div class="d-flex align-items-center">
+              <span class="display-4 me-3"
+                >{{ "%.1f"|format(restaurant.rating_average) }}</span
+              >
+              <div>
+                <div class="text-warning h4">
+                  {% for _ in range(restaurant.rating_average|int) %}★{% endfor
+                  %} {% for _ in range(5 - restaurant.rating_average|int) %}☆{%
+                  endfor %}
+                </div>
+                <small class="text-muted"
+                  >Based on {{ restaurant.reviews|length }} reviews</small
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="card">
+        <div class="card-header">
+          <h4>Reviews</h4>
+        </div>
+        <div class="card-body">
+          {% if current_user.is_authenticated %}
+          <!-- Review Form -->
+          <form
+            method="POST"
+            action="{{ url_for('user.add_review', restaurant_id=restaurant.id) }}"
+            class="mb-4"
+          >
+            <div class="mb-3">
+              <label class="form-label">Your Rating</label>
+              <div class="rating">
+                {% for i in range(5, 0, -1) %}
+                <input
+                  type="radio"
+                  name="rating"
+                  value="{{ i }}"
+                  id="star{{ i }}"
+                  required
+                />
+                <label for="star{{ i }}">★</label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Your Review</label>
+              <textarea
+                class="form-control"
+                id="comment"
+                name="comment"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+          </form>
+          {% endif %}
+
+          <!-- Reviews List -->
+          {% for review in restaurant.reviews %}
+          <div class="review-item border-bottom mb-3 pb-3">
+            <div class="d-flex justify-content-between">
+              <h6>{{ review.user.username }}</h6>
+              <small class="text-muted"
+                >{{ review.created_at.strftime('%Y-%m-%d') }}</small
+              >
+            </div>
+            <div class="text-warning">
+              {% for _ in range(review.rating) %}★{% endfor %} {% for _ in
+              range(5 - review.rating) %}☆{% endfor %}
+            </div>
+            <p class="mt-2">{{ review.comment }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+      <!-- Similar Restaurants -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Similar Restaurants</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for similar in similar_restaurants %}
+          <a
+            href="{{ url_for('main.restaurant_detail', id=similar.id) }}"
+            class="list-group-item list-group-item-action"
+          >
+            <div class="d-flex justify-content-between align-items-center">
+              <h6 class="mb-1">{{ similar.name }}</h6>
+              <small class="text-warning"
+                >★ {{ "%.1f"|format(similar.rating_average) }}</small
+              >
+            </div>
+            <small class="text-muted">{{ similar.category }}</small>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  function toggleFavorite(restaurantId) {
+    fetch(`/user/favorite/toggle/${restaurantId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
+          const heartIcon = document.querySelector(".btn-outline-danger i");
+          if (data.is_favorite) {
+            heartIcon.classList.remove("bi-heart");
+            heartIcon.classList.add("bi-heart-fill");
+          } else {
+            heartIcon.classList.remove("bi-heart-fill");
+            heartIcon.classList.add("bi-heart");
+          }
+        } else {
+          throw new Error(data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Failed to update favorite status");
+      });
+  }
+</script>
+{% endblock %}

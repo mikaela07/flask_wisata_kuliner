@@ -1,0 +1,223 @@
+{% extends "base.html" %} {% block title %}My Profile - Wisata Kuliner{%
+endblock %} {% block content %}
+<div class="container">
+  <!-- User Profile Content -->
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h2>Profile</h2>
+          <p>Username: {{ current_user.username }}</p>
+          <p>Email: {{ current_user.email }}</p>
+          {% if current_user.rating_average %}
+          <p>
+            Average Rating: {{ "%.1f"|format(current_user.rating_average) }}
+          </p>
+          {% endif %}
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#editProfileModal"
+          >
+            Edit Profile
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Summary -->
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Activity Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <h3>{{ reviews|length if reviews else 0 }}</h3>
+              <p class="text-muted">Reviews</p>
+            </div>
+            <div class="col-4">
+              <h3>{{ favorites|length if favorites else 0 }}</h3>
+              <p class="text-muted">Favorites</p>
+            </div>
+            <div class="col-4">
+              <h3>
+                {{ "%.1f"|format(ratings_avg if ratings_avg is not none else 0)
+                }}
+              </h3>
+              <p class="text-muted">Avg Rating</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reviews -->
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Recent Reviews</h5>
+          <a
+            href="{{ url_for('user.my_reviews') }}"
+            class="btn btn-sm btn-outline-primary"
+          >
+            View All
+          </a>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for review in recent_reviews %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <h6 class="mb-1">{{ review.restaurant.name }}</h6>
+              <small class="text-muted"
+                >{{ review.created_at.strftime('%Y-%m-%d') }}</small
+              >
+            </div>
+            <p class="mb-1">{{ review.comment }}</p>
+            <small class="text-warning">
+              {% for _ in range(review.rating) %}★{% endfor %} {% for _ in
+              range(5 - review.rating) %}☆{% endfor %}
+            </small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Profile</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('user.update_profile') }}"
+        id="editProfileForm"
+      >
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              value="{{ current_user.username }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              value="{{ current_user.email }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="new_password" class="form-label">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="new_password"
+              name="new_password"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="confirm_password" class="form-label"
+              >Confirm New Password</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="confirm_password"
+              name="confirm_password"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add JavaScript validation -->
+<script>
+  document
+    .getElementById("editProfileForm")
+    .addEventListener("submit", function (event) {
+      const newPassword = document.getElementById("new_password").value;
+      const confirmPassword = document.getElementById("confirm_password").value;
+      const errorDiv = document.getElementById("passwordError");
+
+      // Reset error message
+      errorDiv.classList.add("d-none");
+
+      // Validate only if new password is being set
+      if (newPassword) {
+        if (newPassword.length < 6) {
+          event.preventDefault();
+          errorDiv.textContent = "Password must be at least 6 characters long";
+          errorDiv.classList.remove("d-none");
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          event.preventDefault();
+          errorDiv.textContent = "Passwords do not match";
+          errorDiv.classList.remove("d-none");
+          return;
+        }
+      }
+
+      // Clear confirm password if new password is empty
+      if (!newPassword) {
+        document.getElementById("confirm_password").value = "";
+      }
+    });
+
+  // Show/hide confirm password field based on new password
+  document
+    .getElementById("new_password")
+    .addEventListener("input", function () {
+      const confirmPasswordDiv =
+        document.getElementById("confirm_password").parentElement;
+      if (this.value) {
+        confirmPasswordDiv.style.display = "block";
+      } else {
+        confirmPasswordDiv.style.display = "none";
+        document.getElementById("confirm_password").value = "";
+      }
+    });
+
+  // Initialize confirm password visibility
+  window.addEventListener("load", function () {
+    const newPassword = document.getElementById("new_password");
+    const confirmPasswordDiv =
+      document.getElementById("confirm_password").parentElement;
+    confirmPasswordDiv.style.display = newPassword.value ? "block" : "none";
+  });
+</script>
+{% endblock %}

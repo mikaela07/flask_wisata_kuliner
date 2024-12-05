@@ -1,0 +1,144 @@
+/* Custom styles */
+.jumbotron {
+  background-color: #f8f9fa;
+  border-radius: 0.3rem;
+}
+
+.card {
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Rating stars */
+.text-warning {
+  color: #ffc107 !important;
+}
+
+/* Footer */
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Form styling */
+.card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Auth pages specific styling */
+.auth-container {
+  min-height: calc(100vh - 260px);
+  display: flex;
+  align-items: center;
+}
+
+.auth-card {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Error message styling */
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+}
+
+/* Restaurant cards */
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Rating stars */
+.rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 0.3rem;
+}
+
+.rating input {
+  display: none;
+}
+
+.rating label {
+  cursor: pointer;
+  color: #ddd;
+  font-size: 1.5rem;
+}
+
+.rating input:checked ~ label,
+.rating label:hover,
+.rating label:hover ~ label {
+  color: #ffc107;
+}
+
+/* Review section */
+.review-item:last-child {
+  border-bottom: none !important;
+}
+
+/* Similar restaurants */
+.list-group-item-action:hover {
+  background-color: #f8f9fa;
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-check-input:checked {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.form-check-label {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.form-check-input:checked + .form-check-label {
+  background-color: #fff3cd;
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+}
+
+.star-label {
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.2rem;
+}
+
+.star-label:hover i {
+  color: #ffc107 !important;
+}
+
+.form-check-input:checked + .star-label i {
+  color: #ffc107 !important;
+}

@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block title %}Home - Wisata Kuliner{% endblock
+title %} {% block content %}
+<!-- Hero Section -->
+<div class="jumbotron text-center py-5">
+  <h1 class="display-4">Welcome to Wisata Kuliner</h1>
+  <p class="lead">Discover the best culinary destinations in your area</p>
+  <hr class="my-4" />
+  <p>Find reviews, ratings, and recommendations for restaurants near you.</p>
+  <a
+    class="btn btn-primary btn-lg"
+    href="{{ url_for('main.list_restaurants') }}"
+    role="button"
+  >
+    Explore Restaurants
+  </a>
+</div>
+
+<!-- Restaurant Cards Section -->
+<section class="mt-5">
+  <h2 class="text-center mb-4">Top Rated Restaurants</h2>
+  <div class="row">
+    {% for restaurant in restaurants %}
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        {% if restaurant.image_url %}
+        <img
+          src="{{ restaurant.image_url }}"
+          class="card-img-top"
+          alt="{{ restaurant.name }}"
+        />
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ restaurant.name }}</h5>
+          <p class="card-text">{{ restaurant.description[:100] }}...</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-warning">★</span>
+              <span>{{ "%.1f"|format(restaurant.rating_average) }}</span>
+            </div>
+            <a
+              href="{{ url_for('main.restaurant_detail', id=restaurant.id) }}"
+              class="btn btn-primary"
+              >View Details</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock content %}
